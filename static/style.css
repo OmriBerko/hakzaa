@@ -1,0 +1,204 @@
+:root {
+  --ink: #1c1915;
+  --paper: #f4efe6;
+  --card: #fffdf8;
+  --line: #d9cfc0;
+  --stamp: #8c2f2f;
+  --stamp-soft: #f6e4df;
+  --pine: #1f4d45;
+  --pine-soft: #e5f0ec;
+  --gold: #a36b1d;
+  --muted: #6d645b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 100% 0, #efe2cc 0, transparent 28rem),
+    var(--paper);
+  font-family: "David Libre", "Frank Ruhl Libre", "Noto Sans Hebrew", "Arial Hebrew", Arial, sans-serif;
+  line-height: 1.55;
+}
+
+a { color: var(--pine); }
+
+.top, .rule, .summary, .layout, .all, footer {
+  width: min(1080px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.top {
+  padding: 2.2rem 0 0.6rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.brand { display: flex; gap: 0.9rem; align-items: center; }
+
+.mark {
+  width: 3.2rem;
+  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--stamp);
+  color: var(--stamp);
+  border-radius: 50%;
+  font-size: 1.6rem;
+  background: var(--card);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lede { margin: 0; max-width: 46rem; font-size: 1.05rem; }
+
+.rule {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--pine-soft);
+  border-right: 4px solid var(--pine);
+}
+
+.rule p { margin: 0; }
+
+.banner {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.7rem 1rem;
+  background: var(--stamp-soft);
+  border-right: 4px solid var(--stamp);
+}
+
+.summary {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.summary article {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 0.9rem 1rem;
+}
+
+.num {
+  display: block;
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lbl { color: var(--muted); font-size: 0.92rem; }
+
+.layout {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: 22rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+h2 { margin: 0 0 0.8rem; font-size: 1.35rem; }
+h3 { margin: 0; font-size: 1.2rem; }
+h4 { margin: 0.9rem 0 0.4rem; font-size: 1rem; }
+
+form { display: grid; gap: 0.75rem; }
+
+label, legend { display: grid; gap: 0.25rem; font-weight: 700; }
+
+input[type="text"], input[type="number"], input[type="date"] {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+
+fieldset {
+  margin: 0;
+  border: 1px dashed var(--line);
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.check { font-weight: 500; display: flex; gap: 0.4rem; align-items: center; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+.opt { font-weight: 500; color: var(--muted); }
+
+button {
+  font: inherit;
+  font-weight: 700;
+  border: 0;
+  background: var(--pine);
+  color: #f7f4ee;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover { background: #163b35; }
+
+.fine, .empty, .meta, .source, footer, .why, .caveat { color: var(--muted); }
+
+.card {
+  border-top: 1px solid var(--line);
+  padding: 1rem 0;
+}
+
+.card:first-of-type { border-top: 0; padding-top: 0; }
+
+.amounts { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+.flag {
+  display: inline-block;
+  margin: 0;
+  padding: 0.15rem 0.45rem;
+  background: var(--stamp-soft);
+  color: var(--stamp);
+  font-weight: 700;
+}
+
+.steps { margin: 0.3rem 0 0; padding-inline-start: 1.2rem; }
+.steps li { margin: 0.45rem 0; }
+.steps q { quotes: none; }
+.filled { margin: 0.2rem 0 0; color: var(--ink); font-weight: 700; }
+
+.receive {
+  margin-top: 0.8rem;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+
+.all { margin-top: 1rem; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { text-align: right; padding: 0.45rem 0.3rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 700; }
+
+footer { padding: 1.4rem 0 2.4rem; font-size: 0.92rem; }
+
+@media (max-width: 800px) {
+  .layout, .summary, .receive { grid-template-columns: 1fr; }
+}

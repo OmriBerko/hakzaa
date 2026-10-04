@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקצאה — בדיקת חשבונית בלי מספר הקצאה</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">ה</span>
+      <div>
+        <p class="eyebrow">לפרילנסרים ולעסקים · לא מערכת הנהלת חשבונות</p>
+        <h1>הקצאה</h1>
+      </div>
+    </div>
+    <p class="lede">
+      בדיקה לחשבוניות שהופקו בתוכנה <strong>שלא</strong> מחוברת לרשות המסים,
+      ופירוט הבקשה הרטרואקטיבית כפי שהיא מתוארת במקורות.
+      האפליקציה לא פונה לרשות המסים ולא מגישה שום בקשה.
+    </p>
+  </header>
+
+  <section class="rule" aria-label="הסף">
+    <p>
+      הסף שבשימוש: <strong>{{ threshold_label }}</strong>.
+      חשבונית מתאריך 1.1.2026 עד 31.5.2026 נבדקת מול 10,000 ₪ לפני מע״מ
+      (Invoice4U: «נכון ל-2026, מדובר על 10,000 ₪»).
+      לפני 2026 המקורות לא מציינים סף, ואין סימון אוטומטי.
+    </p>
+  </section>
+
+  {% if error %}
+  <p class="banner" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <section class="summary" aria-label="סיכום" data-flagged="{{ summary.flagged_count }}" data-cleared="{{ summary.cleared_count }}" data-sum="{{ '%.2f'|format(summary.flagged_sum) }}">
+    <article>
+      <span class="num">{{ summary.flagged_count }}</span>
+      <span class="lbl">מסומנות · בלי מספר הקצאה</span>
+    </article>
+    <article>
+      <span class="num">{{ summary.cleared_count }}</span>
+      <span class="lbl">סודרו · המספר נשמר</span>
+    </article>
+    <article>
+      <span class="num">{{ '%.2f'|format(summary.flagged_sum) }} ₪</span>
+      <span class="lbl">סכום מסומנות לפני מע״מ</span>
+    </article>
+  </section>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2>הוספת חשבונית</h2>
+      <form method="post" action="{{ url_for('add_invoice') }}">
+        <label>
+          תאריך החשבונית
+          <input type="date" name="invoice_date" required value="{{ today }}">
+        </label>
+        <label>
+          שם הלקוח
+          <input type="text" name="customer_name" required maxlength="200" autocomplete="off">
+        </label>
+        <div class="pair">
+          <label>
+            סכום לפני מע״מ
+            <input type="number" name="amount_before_vat" min="0" step="0.01" required inputmode="decimal">
+          </label>
+          <label>
+            מע״מ
+            <input type="number" name="vat_amount" min="0" step="0.01" required inputmode="decimal">
+          </label>
+        </div>
+        <label>
+          מספר חשבונית <span class="opt">לא חובה</span>
+          <input type="text" name="invoice_number" maxlength="80" autocomplete="off">
+        </label>
+        <fieldset>
+          <legend>האם כבר מופיע מספר הקצאה על החשבונית?</legend>
+          <label class="check"><input type="radio" name="has_allocation" value="no" checked> אין מספר</label>
+          <label class="check"><input type="radio" name="has_allocation" value="yes"> יש מספר</label>
+          <label>
+            מספר ההקצאה, אם יש
+            <input type="text" name="allocation_number" maxlength="40" autocomplete="off">
+          </label>
+        </fieldset>
+        <button type="submit">שמירה ברשימה</button>
+      </form>
+      <p class="fine">
+        הנתונים נשמרים במסד מקומי על המחשב הזה. אין שליחה החוצה.
+      </p>
+    </section>
+
+    <section class="panel flagged-panel">
+      <h2>דורשות טיפול</h2>
+      {% if not flagged %}
+      <p class="empty">אין כרגע חשבונית מעל הסף בלי מספר הקצאה.</p>
+      {% endif %}
+      {% for item in flagged %}
+      <article class="card" id="invoice-{{ item.id }}" data-flagged-customer="{{ item.customer_name }}" data-allocation="">
+        <header>
+          <h3>{{ item.customer_name }}</h3>
+          <p class="meta">
+            {{ item.date_display }}
+            {% if item.invoice_number %} · חשבונית {{ item.invoice_number }}{% endif %}
+          </p>
+        </header>
+        <p class="amounts">
+          <span>לפני מע״מ <strong>{{ item.amount_display }}</strong></span>
+          <span>מע״מ <strong>{{ item.vat_display }}</strong></span>
+        </p>
+        <p class="flag">אין מספר הקצאה · {{ item.threshold_note }}</p>
+        <p class="why">
+          לפי Invoice4U, כשנדרש מספר הקצאה והוא חסר הלקוח לא יוכל לקזז מע״מ,
+          ולכן במקרים רבים יעדיף לא לשלם. הודעה נפוצה מהלקוח: «אין מספר הקצאה».
+        </p>
+        {% if item.zero_vat_caveat %}
+        <p class="caveat">
+          המע״מ שתועד הוא 0. המקורות מציינים שחשבונית בשיעור אפס או שכוללת רק עסקאות פטורות
+          אינה טעונה מספר הקצאה, גם אם הסכום גבוה. הסימון כאן הוא לפי סף וחוסר מספר בלבד.
+        </p>
+        {% endif %}
+
+        <h4>בקשה רטרואקטיבית — תיאור מהכתבה, לא פעולה של האפליקציה</h4>
+        <ol class="steps">
+          {% for step in item.steps %}
+          <li>
+            <q>{{ step.quote }}</q>
+            {% if step.filled %}<p class="filled">{{ step.filled }}</p>{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+        <p class="source">
+          מקור הצעדים:
+          <a href="{{ invoice4u_url }}">Invoice4U, «חשבונית ללא מספר הקצאה»</a>.
+          שדות שהיישום העצמאי של רשות המסים מבקש, לפי Grant Thornton:
+          מספר המסמך, מספר ע.מ/ח.פ של הלקוח, סכום לפני מע״מ, סכום המע״מ ותאריך.
+          מספר ע.מ/ח.פ לא נשמר כאן.
+          <a href="{{ grant_thornton_url }}">Grant Thornton, 1 ביוני / 5,000 ש״ח</a>.
+        </p>
+
+        <form class="receive" method="post" action="{{ url_for('mark_received', invoice_id=item.id) }}">
+          <label>
+            המספר התקבל
+            <input type="text" name="allocation_number" required maxlength="40" placeholder="מספר ההקצאה" autocomplete="off">
+          </label>
+          <button type="submit">סמן כהתקבל</button>
+        </form>
+      </article>
+      {% endfor %}
+    </section>
+  </main>
+
+  <section class="panel all">
+    <h2>כל החשבוניות</h2>
+    {% if not invoices %}
+    <p class="empty">הרשימה ריקה.</p>
+    {% else %}
+    <table>
+      <thead>
+        <tr>
+          <th>תאריך</th>
+          <th>לקוח</th>
+          <th>לפני מע״מ</th>
+          <th>מע״מ</th>
+          <th>מס׳ חשבונית</th>
+          <th>מספר הקצאה</th>
+          <th>מצב</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in invoices %}
+        <tr>
+          <td>{{ item.date_display }}</td>
+          <td>{{ item.customer_name }}</td>
+          <td>{{ item.amount_display }}</td>
+          <td>{{ item.vat_display }}</td>
+          <td>{{ item.invoice_number or "—" }}</td>
+          <td>{{ item.allocation_number or "—" }}</td>
+          <td>
+            {% if item.flagged %}מסומנת
+            {% elif item.cleared %}סודרה
+            {% else %}מתחת לסף או ללא חובה לפי המקור{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </section>
+
+  <footer>
+    <p>
+      הקצאה לא מגישה בקשות לרשות המסים ולא מתחברת אליה.
+      הסף והצעדים לקוחים מ־
+      <a href="{{ invoice4u_url }}">Invoice4U</a>
+      ומ־
+      <a href="{{ grant_thornton_url }}">Grant Thornton Israel</a>
+      בלבד. הכתבה של Invoice4U לא מקשרת אל Grant Thornton; שני המקורות מסכימים על הסף של יוני 2026.
+    </p>
+  </footer>
+</body>
+</html>
